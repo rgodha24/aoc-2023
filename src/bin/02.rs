@@ -1,74 +1,5 @@
 advent_of_code::solution!(2);
 
-pub fn part_one(input: &str) -> Option<u32> {
-    println!("{input}");
-    let lines = input.trim().lines();
-    let parsed = lines
-        .map(|l| {
-            l.split_once(":")
-                .unwrap()
-                .1
-                .trim()
-                .split(";")
-                .map(|s| {
-                    s.trim()
-                        .split(", ")
-                        .map(|s| {
-                            let (first, second) = s.split_once(" ").unwrap();
-                            let first = first.parse::<u32>().unwrap();
-                            let second = match second {
-                                "red" => Color::Red,
-                                "green" => Color::Green,
-                                "blue" => Color::Blue,
-                                _ => panic!("Unknown color"),
-                            };
-                            (first, second)
-                        })
-                        .collect::<Vec<_>>()
-                })
-                .collect::<Vec<_>>()
-        })
-        .collect::<Vec<_>>();
-
-    let singles = parsed
-        .into_iter()
-        .map(|l| {
-            l.into_iter()
-                .map(|s| {
-                    let mut single = Single {
-                        red: 0,
-                        green: 0,
-                        blue: 0,
-                    };
-                    for (value, color) in s {
-                        match color {
-                            Color::Red => single.red = value as usize,
-                            Color::Green => single.green = value as usize,
-                            Color::Blue => single.blue = value as usize,
-                        }
-                    }
-                    single
-                })
-                .collect::<Vec<_>>()
-        })
-        .collect::<Vec<_>>();
-
-    let mut ans = 0;
-    for (i, single) in singles.into_iter().enumerate() {
-        if single
-            .into_iter()
-            .any(|s| s.red > 12 || s.green > 13 || s.blue > 14)
-        {
-            continue;
-        }
-
-        println!("{i}");
-        ans += i + 1;
-    }
-
-    Some(ans as u32)
-}
-
 #[derive(Debug, Clone, Copy)]
 enum Color {
     Red,
@@ -77,71 +8,41 @@ enum Color {
 }
 
 #[derive(Debug, Clone, Copy)]
-struct Single {
+struct Set {
     red: usize,
     green: usize,
     blue: usize,
 }
 
-pub fn part_two(input: &str) -> Option<u32> {
-    println!("{input}");
-    let lines = input.trim().lines();
-    let parsed = lines
-        .map(|l| {
-            l.split_once(":")
-                .unwrap()
-                .1
-                .trim()
-                .split(";")
-                .map(|s| {
-                    s.trim()
-                        .split(", ")
-                        .map(|s| {
-                            let (first, second) = s.split_once(" ").unwrap();
-                            let first = first.parse::<u32>().unwrap();
-                            let second = match second {
-                                "red" => Color::Red,
-                                "green" => Color::Green,
-                                "blue" => Color::Blue,
-                                _ => panic!("Unknown color"),
-                            };
-                            (first, second)
-                        })
-                        .collect::<Vec<_>>()
-                })
-                .collect::<Vec<_>>()
-        })
-        .collect::<Vec<_>>();
+type Game = Vec<Set>;
 
-    let singles = parsed
-        .into_iter()
-        .map(|l| {
-            l.into_iter()
-                .map(|s| {
-                    let mut single = Single {
-                        red: 0,
-                        green: 0,
-                        blue: 0,
-                    };
-                    for (value, color) in s {
-                        match color {
-                            Color::Red => single.red = value as usize,
-                            Color::Green => single.green = value as usize,
-                            Color::Blue => single.blue = value as usize,
-                        }
-                    }
-                    single
-                })
-                .collect::<Vec<_>>()
-        })
-        .collect::<Vec<_>>();
+pub fn part_one(input: &str) -> Option<usize> {
+    let games = parse(input);
 
     let mut ans = 0;
-    for (i, single) in singles.into_iter().enumerate() {
+    for (i, game) in games.into_iter().enumerate() {
+        if game
+            .into_iter()
+            .any(|s| s.red > 12 || s.green > 13 || s.blue > 14)
+        {
+            continue;
+        }
+
+        ans += i + 1;
+    }
+
+    Some(ans as usize)
+}
+
+pub fn part_two(input: &str) -> Option<usize> {
+    let games = parse(input);
+
+    let mut ans = 0;
+    for game in games {
         let mut red = 0;
         let mut green = 0;
         let mut blue = 0;
-        for s in single {
+        for s in game {
             red = red.max(s.red);
             green = green.max(s.green);
             blue = blue.max(s.blue);
@@ -152,7 +53,47 @@ pub fn part_two(input: &str) -> Option<u32> {
         ans += power
     }
 
-    Some(ans as u32)
+    Some(ans as usize)
+}
+
+fn parse(input: &str) -> Vec<Game> {
+    let mut games = Vec::new();
+
+    for line in input.trim().lines() {
+        let (_, important) = line.split_once(":").unwrap();
+        let important = important.trim();
+
+        let game = important
+            .split(";")
+            .map(|set| {
+                let mut s = Set {
+                    red: 0,
+                    green: 0,
+                    blue: 0,
+                };
+                set.trim().split(", ").for_each(|cubes| {
+                    let (value, color) = cubes.split_once(" ").unwrap();
+                    let value = value.parse::<usize>().unwrap();
+                    let color = match color {
+                        "red" => Color::Red,
+                        "green" => Color::Green,
+                        "blue" => Color::Blue,
+                        _ => panic!("Unknown color"),
+                    };
+                    match color {
+                        Color::Red => s.red = value as usize,
+                        Color::Green => s.green = value as usize,
+                        Color::Blue => s.blue = value as usize,
+                    }
+                });
+                s
+            })
+            .collect::<Vec<_>>();
+
+        games.push(game);
+    }
+
+    games
 }
 
 #[cfg(test)]
