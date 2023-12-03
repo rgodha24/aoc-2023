@@ -77,17 +77,17 @@ fn parse(input: &str) -> (Vec<Part>, Vec<(isize, isize, Symbol)>) {
 
         while let Some((x, c)) = iter.next() {
             match c {
-                c if c.is_digit(10) => {
+                c if c.is_ascii_digit() => {
                     let mut num = c.to_digit(10).unwrap();
                     let mut end_x = x;
-                    while matches!(iter.peek(), Some((_, c)) if c.is_digit(10)) {
+                    while matches!(iter.peek(), Some((_, c)) if c.is_ascii_digit()) {
                         let (_, c) = iter.next().unwrap();
                         num = num * 10 + c.to_digit(10).unwrap();
                         end_x += 1;
                     }
 
                     parts.push(Part {
-                        num: num as u32,
+                        num,
                         start_x: x as isize,
                         end_x: end_x as isize,
                         y: y as isize,

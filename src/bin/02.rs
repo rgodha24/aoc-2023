@@ -31,7 +31,7 @@ pub fn part_one(input: &str) -> Option<usize> {
         ans += i + 1;
     }
 
-    Some(ans as usize)
+    Some(ans)
 }
 
 pub fn part_two(input: &str) -> Option<usize> {
@@ -53,18 +53,18 @@ pub fn part_two(input: &str) -> Option<usize> {
         ans += power
     }
 
-    Some(ans as usize)
+    Some(ans)
 }
 
 fn parse(input: &str) -> Vec<Game> {
     let mut games = Vec::new();
 
     for line in input.trim().lines() {
-        let (_, important) = line.split_once(":").unwrap();
+        let (_, important) = line.split_once(':').unwrap();
         let important = important.trim();
 
         let game = important
-            .split(";")
+            .split(';')
             .map(|set| {
                 let mut s = Set {
                     red: 0,
@@ -72,7 +72,7 @@ fn parse(input: &str) -> Vec<Game> {
                     blue: 0,
                 };
                 set.trim().split(", ").for_each(|cubes| {
-                    let (value, color) = cubes.split_once(" ").unwrap();
+                    let (value, color) = cubes.split_once(' ').unwrap();
                     let value = value.parse::<usize>().unwrap();
                     let color = match color {
                         "red" => Color::Red,
@@ -81,9 +81,9 @@ fn parse(input: &str) -> Vec<Game> {
                         _ => panic!("Unknown color"),
                     };
                     match color {
-                        Color::Red => s.red = value as usize,
-                        Color::Green => s.green = value as usize,
-                        Color::Blue => s.blue = value as usize,
+                        Color::Red => s.red = value,
+                        Color::Green => s.green = value,
+                        Color::Blue => s.blue = value,
                     }
                 });
                 s

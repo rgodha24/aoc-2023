@@ -21,7 +21,7 @@ pub fn part_two(input: &str) -> Option<u32> {
                     // the as_bytes is just so we don't clone for no reason
                     // and the b'x' is a character auto-converted to a byte
                     let n = match s.as_bytes()[i..] {
-                        [c, ..] if (c as char).is_digit(10) => (c as char).to_digit(10),
+                        [c, ..] if (c as char).is_ascii_digit() => (c as char).to_digit(10),
                         [b'o', b'n', b'e', ..] => Some(1),
                         [b't', b'w', b'o', ..] => Some(2),
                         [b't', b'h', b'r', b'e', b'e', ..] => Some(3),
