@@ -1,5 +1,5 @@
 advent_of_code::solution!(4);
-use std::collections::{BTreeMap, HashMap, HashSet};
+use std::collections::HashSet;
 
 use itertools::Itertools;
 
@@ -55,8 +55,8 @@ fn parse(input: &str) -> Vec<(HashSet<u32>, Vec<u32>)> {
     let mut cards = Vec::new();
 
     for input in input.lines() {
-        let (_, input) = input.split_once(":").unwrap();
-        let (left, right) = input.split_once("|").unwrap();
+        let (_, input) = input.split_once(':').unwrap();
+        let (left, right) = input.split_once('|').unwrap();
 
         let winning: HashSet<_> = left
             .split_whitespace()
