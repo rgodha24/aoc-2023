@@ -68,7 +68,6 @@ pub fn part_two(input: &str) -> Option<usize> {
     let seeds: HashSet<usize> = seeds.into_iter().map(|(a, _)| a).collect();
     let mut seeds = seeds.into_iter().collect::<Vec<_>>();
     seeds.sort();
-    println!("locations: {:?}", &seeds[0..5]);
 
     // this doesn't work for the real thing for some reason??
     // on my real input, the answer was seeds[2] LMAO
