@@ -1,7 +1,7 @@
 advent_of_code::solution!(7);
 use derive_more::{Deref, DerefMut};
 use itertools::Itertools;
-use std::{cmp::Ordering, collections::HashMap, str::FromStr};
+use std::{cmp::Ordering, str::FromStr};
 
 pub fn part_one(input: &str) -> Option<usize> {
     Some(solve(input, |_| {}))
@@ -110,7 +110,7 @@ impl Cards {
 
     /// returns instances of (most_common, second_most_common)
     fn most_common(&self) -> (usize, usize) {
-        let mut v = vec![0; 14];
+        let mut v = [0; 14];
 
         self.iter().for_each(|c| {
             if *c == Card::Joker {

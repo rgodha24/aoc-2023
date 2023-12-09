@@ -14,8 +14,8 @@ pub fn part_two(input: &str) -> Option<usize> {
 
     let curr = grid
         .keys()
-        .filter(|&k| k.ends_with("A"))
-        .map(|&s| time_to(s, &dirs, &grid, |s| s.ends_with("Z")))
+        .filter(|&k| k.ends_with('A'))
+        .map(|&s| time_to(s, &dirs, &grid, |s| s.ends_with('Z')))
         .collect_vec();
 
     Some(lcm(curr))
@@ -44,7 +44,7 @@ fn time_to(
             Dir::L => left,
         };
 
-        if is_done(*next) {
+        if is_done(next) {
             return i + 1;
         }
 
@@ -74,8 +74,8 @@ fn parse(input: &str) -> (Vec<Dir>, BTreeMap<&str, (&str, &str)>) {
         .map(|l| {
             let (start, rest) = l.split_once(" = ").unwrap();
             let (left, right) = rest.split_once(", ").unwrap();
-            let left = left.trim_start_matches("(");
-            let right = right.trim_end_matches(")");
+            let left = left.trim_start_matches('(');
+            let right = right.trim_end_matches(')');
 
             (start, (left, right))
         })
@@ -86,7 +86,7 @@ fn parse(input: &str) -> (Vec<Dir>, BTreeMap<&str, (&str, &str)>) {
 
 fn lcm(data: Vec<usize>) -> usize {
     // love that this needs a whole ass crate
-    data.into_iter().fold(1, |acc, x| num::integer::lcm(acc, x))
+    data.into_iter().fold(1, num::integer::lcm)
 }
 
 #[cfg(test)]

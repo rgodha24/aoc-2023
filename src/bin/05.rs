@@ -6,9 +6,9 @@ use itertools::Itertools;
 pub fn part_one(input: &str) -> Option<usize> {
     let (mut seeds, maps) = parse(input);
 
-    for i in 0..=6 {
+    for map in maps {
         for seed in seeds.iter_mut() {
-            *seed = maps[i].dest_of(*seed);
+            *seed = map.dest_of(*seed);
         }
     }
 
@@ -28,11 +28,10 @@ pub fn part_two(input: &str) -> Option<usize> {
         .collect::<Vec<_>>();
 
     // might be O(n^4) lmao
-    for i in 0..=6 {
+    for map in maps {
         seeds.reverse();
 
         let mut new_seeds = Vec::new();
-        let map = &maps[i];
 
         while let Some((start, end)) = seeds.pop() {
             for (range_start, range_end) in map.ranges() {
@@ -184,7 +183,7 @@ fn parse(input_str: &str) -> (Vec<usize>, Vec<Map>) {
     let mut maps = Vec::new();
 
     for m in double_lines[1..].iter() {
-        let (_, map) = m.split_once("\n").unwrap();
+        let (_, map) = m.split_once('\n').unwrap();
         maps.push(map.parse().unwrap());
     }
 

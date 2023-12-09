@@ -2,23 +2,21 @@ advent_of_code::solution!(6);
 use itertools::Itertools;
 
 pub fn part_one(input: &str) -> Option<usize> {
-    let (first, second) = input.split_once("\n").unwrap();
-    let (_, time) = first.split_once(":").unwrap();
+    let (first, second) = input.split_once('\n').unwrap();
+    let (_, time) = first.split_once(':').unwrap();
     let time = time
-        .trim()
         .split_whitespace()
         .map(|x| x.parse::<u32>().unwrap())
         .collect_vec();
-    let (_, distance) = second.split_once(":").unwrap();
+    let (_, distance) = second.split_once(':').unwrap();
     let distance = distance
-        .trim()
         .split_whitespace()
         .map(|x| x.parse::<u32>().unwrap())
         .collect_vec();
 
     Some(
         time.into_iter()
-            .zip(distance.into_iter())
+            .zip(distance)
             // do this for every single (time, distance) combination
             .map(|(t, d)| {
                 (0..t)
@@ -36,15 +34,15 @@ pub fn part_one(input: &str) -> Option<usize> {
 }
 
 pub fn part_two(input: &str) -> Option<usize> {
-    let (first, second) = input.split_once("\n").unwrap();
-    let (_, time) = first.split_once(":").unwrap();
-    let time = time.replace(" ", "").parse::<usize>().unwrap();
+    let (first, second) = input.split_once('\n').unwrap();
+    let (_, time) = first.split_once(':').unwrap();
+    let time = time.replace(' ', "").parse::<usize>().unwrap();
     let distance = second
         .trim()
-        .split_once(":")
+        .split_once(':')
         .unwrap()
         .1
-        .replace(" ", "")
+        .replace(' ', "")
         .parse::<usize>()
         .unwrap();
 
