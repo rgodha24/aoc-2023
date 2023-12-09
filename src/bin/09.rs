@@ -8,8 +8,8 @@ pub fn part_one(input: &str) -> Option<i32> {
 
     let ans = histories
         .iter_mut()
+        // this should never fail, but returning options allows us to use the ? operator
         .filter_map(|h| {
-            // this should never fail, but returning options allows us to use the ? operator
             h.last_mut()?.push(0);
 
             // iterating from bottom to top, where prev is underneath (later than) curr
@@ -22,7 +22,7 @@ pub fn part_one(input: &str) -> Option<i32> {
             }
 
             // last number of earliest history
-            Some(h.first()?.last()?)
+            h[0].last()
         })
         .sum::<i32>();
 
@@ -55,7 +55,7 @@ pub fn part_two(input: &str) -> Option<i32> {
             }
 
             // first number of earliest history
-            Some(h.first_mut()?[0])
+            Some(h[0][0])
         })
         .sum::<i32>();
 
