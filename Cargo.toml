@@ -14,6 +14,7 @@ doctest = false
 test_lib = []
 
 [dependencies]
+colored = "2.1.0"
 derive_more = "0.99.17"
 indicatif = "0.17.7"
 itertools = "0.12.0"
