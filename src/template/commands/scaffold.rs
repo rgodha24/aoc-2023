@@ -8,6 +8,7 @@ use crate::Day;
 
 const MODULE_TEMPLATE: &str = r#"advent_of_code::solution!(DAY_NUMBER);
 use itertools::Itertools;
+use advent_of_code::helpers::*;
 
 pub fn part_one(input: &str) -> Option<u32> {
     None

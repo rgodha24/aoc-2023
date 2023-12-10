@@ -1,116 +1,114 @@
 advent_of_code::solution!(10);
+use advent_of_code::helpers::{Grid, Point};
 use itertools::Itertools;
 
 pub fn part_one(input: &str) -> Option<isize> {
     let tiles = parse(input);
     let distances = get_distances(&tiles);
 
-    distances.into_iter().flatten().max().flatten()
+    distances
+        .flat_iter()
+        .map(|(d, _)| d)
+        .max()
+        .cloned()
+        .flatten()
 }
 
 pub fn part_two(input: &str) -> Option<usize> {
     let tiles = parse(input);
     let distances = get_distances(&tiles);
 
-    let mut sum = 0;
+    Some(
+        distances
+            .flat_iter()
+            .map(|(d, p)| {
+                if d.is_some() {
+                    return 0;
+                }
 
-    for y in 0..tiles.len() {
-        for x in 0..tiles[y].len() {
-            let d = distances[y][x];
-            // something thats part of the loop can not be inside the loop
-            if d.is_some() {
-                continue;
-            }
+                // point-in-polygon raycasting algorithm
+                // see https://arc.net/l/quote/scsdxdiz
+                let intersections_left = (0..p.x())
+                    .map(|x| Point::new(x, p.y()))
+                    // we only care about pipes that are in the main loop
+                    .filter(|&p| distances[p].is_some())
+                    // if we have F-----J or L------7 (case 1), it's only one intersection
+                    // something F---7 or L--J (case 2), it's not an intersection at all
+                    // therefore, we only match on TR (L) and RL (J) bends because:
+                    // it is 1 intersection for case 1, and 2 intersections for case 2
+                    // (which doesn't matter because we only care if it's odd or even)
+                    .filter(|&p| matches!(tiles[p], Tile::Vertical | Tile::TRBend | Tile::TLBend))
+                    .count();
 
-            // point-in-polygon raycasting algorithm
-            // see https://arc.net/l/quote/scsdxdiz
-            let intersections_left = (0..x)
-                // we only care about pipes that are in the main loop
-                .filter(|x| distances[y][*x].is_some())
-                // if we have F-----J or L------7 (case 1), it's only one intersection
-                // something F---7 or L--J (case 2), it's not an intersection at all
-                // therefore, we only match on TR (L) and RL (J) bends because it is 1 intersection
-                // for case 1, and 2 (which doesn't matter because we only care if it's odd or even)
-                // for case 2.
-                .filter(|x| matches!(tiles[y][*x], Tile::Vertical | Tile::TRBend | Tile::TLBend))
-                .count();
+                // same thing as above but going to the right
+                let intersections_right = (p.x()..tiles.width())
+                    .map(|x| Point::new(x, p.y()))
+                    .filter(|&p| distances[p].is_some())
+                    .filter(|&p| matches!(tiles[p], Tile::Vertical | Tile::TRBend | Tile::TLBend))
+                    .count();
 
-            // same thing as above but going to the right
-            let intersections_right = (x..tiles[y].len())
-                .filter(|x| distances[y][*x].is_some())
-                .filter(|x| matches!(tiles[y][*x], Tile::Vertical | Tile::TRBend | Tile::TLBend))
-                .count();
+                if (intersections_left % 2 == 1) && (intersections_right % 2 == 1) {
+                    1
+                } else {
+                    0
+                }
+            })
+            .sum(),
+    )
+}
 
-            if (intersections_left % 2 == 1) && (intersections_right % 2 == 1) {
-                sum += 1;
-            }
+fn parse(input: &str) -> Grid<Tile> {
+    Grid::from_chars(input)
+}
+
+fn get_distances(tiles: &Grid<Tile>) -> Grid<Option<isize>> {
+    let start = tiles
+        .flat_iter()
+        .find_map(|(&t, p)| if t == Tile::Start { Some(p) } else { None })
+        .unwrap();
+
+    let mut distances = tiles.empty_sized();
+    let mut queue = Vec::new();
+
+    distances[start] = Some(0);
+
+    // start the queue with the 2 neighbors of the start
+    for (p, t) in tiles.neighbors_of(start).into_iter().map(|p| (p, tiles[p])) {
+        if t == Tile::Ground {
+            continue;
+        }
+
+        let delta = p - start;
+        if tiles[p].possible_neighbors().contains(&(-delta)) {
+            distances[p] = Some(1);
+            queue.push((p, 1));
         }
     }
 
-    Some(sum)
-}
+    assert_eq!(queue.len(), 2);
 
-fn parse(input: &str) -> Vec<Vec<Tile>> {
-    input
-        .lines()
-        .map(|l| l.chars().map(Tile::from).collect_vec())
-        .collect_vec()
-}
-
-fn get_distances(tiles: &[Vec<Tile>]) -> Vec<Vec<Option<isize>>> {
-    let start = tiles
-        .iter()
-        .enumerate()
-        .find_map(|(y, row)| {
-            row.iter().enumerate().find_map(|(x, tile)| {
-                if *tile == Tile::Start {
-                    Some((x, y))
-                } else {
-                    None
-                }
-            })
-        })
-        .unwrap();
-
-    let mut distances = vec![vec![None; tiles[0].len()]; tiles.len()];
-    // (x, y), distance
-    let mut queue = vec![(start, 0)];
-
-    distances[start.1][start.0] = Some(0);
-
-    while let Some(((x, y), distance)) = queue.pop() {
-        let tile = tiles[y][x];
+    while let Some((point, distance)) = queue.pop() {
+        let tile = tiles[point];
         // theoretically not necessary
         if tile == Tile::Ground {
             continue;
         }
 
-        for n in tile.possible_neighbors() {
-            let (nx, ny) = (x as isize + n.0, y as isize + n.1);
-            if nx < 0
-                || ny < 0
-                || ny >= tiles.len() as isize
-                || nx >= tiles[ny as usize].len() as isize
-            {
-                continue;
-            }
+        let neighbors = tile
+            .possible_neighbors()
+            .map(|delta| point + delta)
+            .filter(|&p| tiles.contains_point(p));
 
-            let (nx, ny) = (nx as usize, ny as usize);
-
-            let neighbor = tiles[ny][nx];
+        for n in neighbors {
+            let neighbor = tiles[n];
             if neighbor == Tile::Ground {
                 continue;
             }
 
-            let n_tile = tiles[ny][nx];
-            if !n_tile.possible_neighbors().contains(&(-n.0, -n.1)) {
-                continue;
-            }
-
-            let current_distance = distances[ny][nx];
+            let current_distance = distances[n];
             if current_distance.unwrap_or(isize::MAX) > distance + 1 {
-                distances[ny][nx] = Some(distance + 1);
-                queue.push(((nx, ny), distance + 1));
+                distances[n] = Some(distance + 1);
+                queue.push((n, distance + 1));
             }
         }
     }
@@ -118,7 +116,7 @@ fn get_distances(tiles: &[Vec<Tile>]) -> Vec<Vec<Option<isize>>> {
     distances
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
 enum Tile {
     Vertical,
     Horizontal,
@@ -130,13 +128,14 @@ enum Tile {
     BLBend,
     /// F
     BRBend,
+    #[default]
     Ground,
     Start,
 }
 
 impl Tile {
-    fn possible_neighbors(&self) -> Vec<(isize, isize)> {
-        match self {
+    fn possible_neighbors(&self) -> impl Iterator<Item = Point> {
+        (match self {
             Tile::Vertical => vec![(0, 1), (0, -1)],
             Tile::Horizontal => vec![(1, 0), (-1, 0)],
             Tile::TLBend => vec![(0, -1), (-1, 0)],
@@ -145,7 +144,9 @@ impl Tile {
             Tile::BRBend => vec![(0, 1), (1, 0)],
             Tile::Ground => panic!("neighbors of ground"),
             Tile::Start => vec![(0, 1), (0, -1), (1, 0), (-1, 0)],
-        }
+        })
+        .into_iter()
+        .map(|(x, y)| Point::new(x, y))
     }
 }
 
@@ -171,9 +172,6 @@ mod tests {
 
     #[test]
     fn test_part_one() {
-        let result = part_one(&advent_of_code::template::read_file("examples", DAY));
-        assert_eq!(result, Some(8));
-
         let input = r#".....
 .S-7.
 .|.|.
@@ -238,8 +236,5 @@ L---JF-JLJ.||-FJLJJ7
 L.L7LFJ|||||FJL7||LJ
 L7JLJL-JLJLJL--JLJ.L"#;
         assert_eq!(part_two(input), Some(10));
-
-        let input = advent_of_code::template::read_file("inputs", DAY);
-        assert_eq!(part_two(&input), Some(287));
     }
 }

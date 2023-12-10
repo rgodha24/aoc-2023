@@ -1,3 +1,4 @@
+use advent_of_code::helpers::*;
 use itertools::Itertools;
 use std::collections::HashSet;
 
@@ -21,12 +22,10 @@ pub fn part_one(input: &str) -> Option<u32> {
     let (parts, symbols) = parse(input);
 
     let mut ans = HashSet::new();
-    for (x, y, _) in symbols {
-        for (dx, dy) in itertools::iproduct!(-1..=1, -1..=1) {
-            let x = x + dx;
-            let y = y + dy;
+    for (point, _) in symbols {
+        for n in point.neighbors_diag() {
             for part in &parts {
-                if y == part.y && (part.start_x..=part.end_x).contains(&x) {
+                if n.y == part.y && (part.start_x..=part.end_x).contains(&n.x) {
                     ans.insert(part.num);
                     break;
                 }
@@ -42,17 +41,15 @@ pub fn part_two(input: &str) -> Option<u32> {
 
     let symbols = symbols
         .into_iter()
-        .filter(|(_, _, s)| matches!(s, Symbol::Gear))
+        .filter(|(_, s)| matches!(s, Symbol::Gear))
         .collect_vec();
 
     let mut sum = 0;
-    for (x, y, _) in symbols {
+    for (point, _) in symbols {
         let mut gears = HashSet::new();
-        for (dx, dy) in itertools::iproduct!(-1..=1, -1..=1) {
-            let x = x + dx;
-            let y = y + dy;
+        for n in point.neighbors_diag() {
             for part in &parts {
-                if y == part.y && (part.start_x..=part.end_x).contains(&x) {
+                if n.y == part.y && (part.start_x..=part.end_x).contains(&n.x) {
                     gears.insert(part.num);
                     break;
                 }
@@ -68,7 +65,7 @@ pub fn part_two(input: &str) -> Option<u32> {
     Some(sum)
 }
 
-fn parse(input: &str) -> (Vec<Part>, Vec<(isize, isize, Symbol)>) {
+fn parse(input: &str) -> (Vec<Part>, Vec<(Point, Symbol)>) {
     let mut parts = vec![];
     let mut symbols = vec![];
 
@@ -94,8 +91,8 @@ fn parse(input: &str) -> (Vec<Part>, Vec<(isize, isize, Symbol)>) {
                     });
                 }
                 '.' => {}
-                '*' => symbols.push((x as isize, y as isize, Symbol::Gear)),
-                _ => symbols.push((x as isize, y as isize, Symbol::Other)),
+                '*' => symbols.push((Point::new(x, y), Symbol::Gear)),
+                _ => symbols.push((Point::new(x, y), Symbol::Other)),
             }
         }
     }
