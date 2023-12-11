@@ -194,6 +194,23 @@ impl<T> Grid<T> {
         Grid { data }
     }
 
+    pub fn rows(&self) -> impl Iterator<Item = &Vec<T>> {
+        self.data.iter()
+    }
+
+    pub fn cols(&self) -> impl Iterator<Item = Vec<&T>> {
+        let width = self.width();
+        (0..width).map(move |i| self.data.iter().map(move |row| &row[i]).collect())
+    }
+
+    pub fn row(&self, y: usize) -> &[T] {
+        &self.data[y]
+    }
+
+    pub fn col(&self, x: usize) -> Vec<&T> {
+        self.data.iter().map(|row| &row[x]).collect()
+    }
+
     pub fn find_index(&self, is_correct: impl Fn(&T, &Point) -> bool) -> Option<Point> {
         todo!()
     }
@@ -223,6 +240,17 @@ impl<T: Clone + Default> Grid<T> {
 
         // Update the grid with the new order
         self.data = new_data.data;
+    }
+
+    pub fn insert_empty_row(&mut self, index: usize) {
+        self.data
+            .insert(index, vec![Default::default(); self.width()]);
+    }
+
+    pub fn insert_empty_col(&mut self, index: usize) {
+        for row in self.data.iter_mut() {
+            row.insert(index, Default::default());
+        }
     }
 }
 

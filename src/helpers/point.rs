@@ -2,7 +2,7 @@
 
 use std::{
     fmt::Display,
-    ops::{Add, Neg, Sub},
+    ops::{Add, Neg, Range, Sub},
 };
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
@@ -49,6 +49,17 @@ impl Point {
     }
     pub fn y_u(&self) -> usize {
         self.y::<usize>()
+    }
+
+    pub fn y_between(&self, other: &Self) -> Range<usize> {
+        let start = self.y_u().min(other.y_u());
+        let end = self.y_u().max(other.y_u());
+        start..end
+    }
+    pub fn x_between(&self, other: &Self) -> Range<usize> {
+        let start = self.x_u().min(other.x_u());
+        let end = self.x_u().max(other.x_u());
+        start..end
     }
 
     pub fn neighbors(&self) -> [Self; 4] {
