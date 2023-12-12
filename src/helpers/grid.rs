@@ -210,10 +210,6 @@ impl<T> Grid<T> {
     pub fn col(&self, x: usize) -> Vec<&T> {
         self.data.iter().map(|row| &row[x]).collect()
     }
-
-    pub fn find_index(&self, is_correct: impl Fn(&T, &Point) -> bool) -> Option<Point> {
-        todo!()
-    }
 }
 
 impl<T: Debug> Debug for Grid<T> {
