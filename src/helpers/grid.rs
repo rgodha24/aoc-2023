@@ -43,6 +43,10 @@ impl<T> Grid<T> {
         })
     }
 
+    pub fn points(&self) -> impl Iterator<Item = Point> {
+        itertools::iproduct!(0..self.width(), 0..self.height()).map(|(x, y)| Point::new(x, y))
+    }
+
     pub fn width(&self) -> usize {
         self.data[0].len()
     }
@@ -203,7 +207,7 @@ impl<T> Grid<T> {
         (0..width).map(move |i| self.data.iter().map(move |row| &row[i]).collect())
     }
 
-    pub fn row(&self, y: usize) -> &[T] {
+    pub fn row(&self, y: usize) -> &Vec<T> {
         &self.data[y]
     }
 
