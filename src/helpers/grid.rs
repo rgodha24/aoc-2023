@@ -85,7 +85,7 @@ impl<T> Grid<T> {
     }
 
     /// iterates over grid, immutably
-    pub fn for_each(&self, f: impl Fn(&T, Point)) {
+    pub fn for_each(&self, mut f: impl FnMut(&T, Point)) {
         for (y, row) in self.iter().enumerate() {
             for (x, col) in row.iter().enumerate() {
                 f(col, Point::new(x, y));
