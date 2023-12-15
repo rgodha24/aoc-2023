@@ -60,12 +60,9 @@ impl Mirror {
                     let a = self.0[above];
                     let c = self.0[p];
 
-                    match (a, c) {
-                        (Tile::Empty, Tile::RoundRock) => {
-                            self.0[above] = Tile::RoundRock;
-                            self.0[p] = Tile::Empty;
-                        }
-                        _ => {}
+                    if let (Tile::Empty, Tile::RoundRock) = (a, c) {
+                        self.0[above] = Tile::RoundRock;
+                        self.0[p] = Tile::Empty;
                     }
                 }
             }
@@ -85,12 +82,9 @@ impl Mirror {
                     let a = self.0[above];
                     let c = self.0[p];
 
-                    match (a, c) {
-                        (Tile::Empty, Tile::RoundRock) => {
-                            self.0[above] = Tile::RoundRock;
-                            self.0[p] = Tile::Empty;
-                        }
-                        _ => {}
+                    if let (Tile::Empty, Tile::RoundRock) = (a, c) {
+                        self.0[above] = Tile::RoundRock;
+                        self.0[p] = Tile::Empty;
                     }
                 }
             }
@@ -110,12 +104,9 @@ impl Mirror {
                     let a = self.0[above];
                     let c = self.0[p];
 
-                    match (a, c) {
-                        (Tile::Empty, Tile::RoundRock) => {
-                            self.0[above] = Tile::RoundRock;
-                            self.0[p] = Tile::Empty;
-                        }
-                        _ => {}
+                    if let (Tile::Empty, Tile::RoundRock) = (a, c) {
+                        self.0[above] = Tile::RoundRock;
+                        self.0[p] = Tile::Empty;
                     }
                 }
             }
@@ -135,12 +126,9 @@ impl Mirror {
                     let a = self.0[above];
                     let c = self.0[p];
 
-                    match (a, c) {
-                        (Tile::Empty, Tile::RoundRock) => {
-                            self.0[above] = Tile::RoundRock;
-                            self.0[p] = Tile::Empty;
-                        }
-                        _ => {}
+                    if let (Tile::Empty, Tile::RoundRock) = (a, c) {
+                        self.0[above] = Tile::RoundRock;
+                        self.0[p] = Tile::Empty;
                     }
                 }
             }

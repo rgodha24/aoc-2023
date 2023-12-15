@@ -15,7 +15,7 @@ pub fn part_two(input: &str) -> Option<usize> {
             let label = unsafe { std::str::from_utf8_unchecked(label) };
             let index = hash(label) as usize;
 
-            if state[index].iter().find(|(x, _)| x == &label).is_some() {
+            if state[index].iter().any(|(x, _)| x == &label) {
                 state[index].retain(|(x, _)| x != &label);
             }
         }
@@ -35,9 +35,9 @@ pub fn part_two(input: &str) -> Option<usize> {
     });
 
     let mut ans = 0;
-    for i in 0..256 {
-        for (j, (_, n)) in state[i].iter().enumerate() {
-            ans += (i + 1) * (j + 1) * (*n as usize);
+    for (i, s) in state.into_iter().enumerate() {
+        for (j, (_, n)) in s.into_iter().enumerate() {
+            ans += (i + 1) * (j + 1) * (n as usize);
         }
     }
 
@@ -99,6 +99,3 @@ mod tests {
         assert_eq!(hash(input), expected);
     }
 }
-
-
-

@@ -7,6 +7,12 @@ pub struct Cycleable<T: Eq> {
     pub cycles_at: Option<(usize, usize)>,
 }
 
+impl<T: Eq> Default for Cycleable<T> {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl<T: Eq> Cycleable<T> {
     pub fn new() -> Self {
         Self {

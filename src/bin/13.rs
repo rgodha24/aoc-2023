@@ -63,8 +63,8 @@ impl Pattern {
 
     fn fold_location_new(&self, cant_be: Option<FoldLocation>) -> Option<FoldLocation> {
         let locs = (0..self.0.width())
-            .map(|x| FoldLocation::Column(x))
-            .chain((0..self.0.height()).map(|y| FoldLocation::Row(y)));
+            .map(FoldLocation::Column)
+            .chain((0..self.0.height()).map(FoldLocation::Row));
 
         for l in locs {
             let is_eq = match l {
