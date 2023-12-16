@@ -214,6 +214,16 @@ impl<T> Grid<T> {
     pub fn col(&self, x: usize) -> Vec<&T> {
         self.data.iter().map(|row| &row[x]).collect()
     }
+
+    /// returns an iterator of the points in the grid at the specified x coordinate
+    pub fn y_points_at(&self, x: usize) -> impl Iterator<Item = Point> {
+        (0..self.height()).map(move |y| Point::new(x, y))
+    }
+
+    /// returns an iterator of the points in the grid at the specified y coordinate
+    pub fn x_points_at(&self, y: usize) -> impl Iterator<Item = Point> {
+        (0..self.width()).map(move |x| Point::new(x, y))
+    }
 }
 
 impl<T: Debug> Debug for Grid<T> {
