@@ -1,6 +1,7 @@
 advent_of_code::solution!(8);
 use std::collections::BTreeMap;
 
+use advent_of_code::helpers::*;
 use itertools::Itertools;
 
 pub fn part_one(input: &str) -> Option<usize> {
@@ -12,13 +13,11 @@ pub fn part_one(input: &str) -> Option<usize> {
 pub fn part_two(input: &str) -> Option<usize> {
     let (dirs, grid) = parse(input);
 
-    let curr = grid
-        .keys()
-        .filter(|&k| k.ends_with('A'))
-        .map(|&s| time_to(s, &dirs, &grid, |s| s.ends_with('Z')))
-        .collect_vec();
-
-    Some(lcm(curr))
+    Some(math::lcm(
+        grid.keys()
+            .filter(|&k| k.ends_with('A'))
+            .map(|&s| time_to(s, &dirs, &grid, |s| s.ends_with('Z'))),
+    ))
 }
 
 enum Dir {
@@ -84,11 +83,6 @@ fn parse(input: &str) -> (Vec<Dir>, BTreeMap<&str, (&str, &str)>) {
     (dirs, grid)
 }
 
-fn lcm(data: Vec<usize>) -> usize {
-    // love that this needs a whole ass crate
-    data.into_iter().fold(1, num::integer::lcm)
-}
-
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -112,12 +106,5 @@ ZZZ = (ZZZ, ZZZ)"#;
     fn test_part_two() {
         let result = part_two(&advent_of_code::template::read_file("examples", DAY));
         assert_eq!(result, Some(6));
-    }
-
-    // this is embarrasing
-    #[test]
-    fn test_lcm() {
-        assert_eq!(lcm(vec![2, 3, 4]), 12);
-        assert_eq!(lcm(vec![2, 3, 4, 5]), 60);
     }
 }

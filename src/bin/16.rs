@@ -1,12 +1,16 @@
 advent_of_code::solution!(16);
-use std::{collections::HashSet, ops::Add};
-
 use advent_of_code::helpers::*;
+use std::collections::HashSet;
+
+// this is an anti pattern in normal rust but its fine in AOC bc we're not
+// gonna change the definition of these enums.
+use Direction::*;
+use Tile::*;
 
 pub fn part_one(input: &str) -> Option<u32> {
     let grid: Grid<Tile> = Grid::from_chars(input);
 
-    Some(energized(&grid, Point::new(0, 0), Direction::Right))
+    Some(energized(&grid, Point::new(0, 0), Right))
 }
 
 pub fn part_two(input: &str) -> Option<u32> {
@@ -14,10 +18,10 @@ pub fn part_two(input: &str) -> Option<u32> {
     let w = grid.width();
     let h = grid.height();
 
-    let lefts = grid.y_points_at(0).map(|p| (p, Direction::Right));
-    let rights = grid.y_points_at(w - 1).map(|p| (p, Direction::Left));
-    let tops = grid.x_points_at(0).map(|p| (p, Direction::Down));
-    let bottoms = grid.x_points_at(h - 1).map(|p| (p, Direction::Up));
+    let lefts = grid.y_points_at(0).map(|p| (p, Right));
+    let rights = grid.y_points_at(w - 1).map(|p| (p, Left));
+    let tops = grid.x_points_at(0).map(|p| (p, Down));
+    let bottoms = grid.x_points_at(h - 1).map(|p| (p, Up));
 
     let iter = lefts
         .chain(rights)
@@ -52,10 +56,6 @@ fn f(
     grid: &Grid<Tile>,
     taken_splits: &mut HashSet<Point>,
 ) {
-    // this is an anti-pattern in real code but aoc doesn't change so its fine
-    use Direction::*;
-    use Tile::*;
-
     loop {
         // stop ourselves if we're off the map
         if !grid.contains_point(p) {
@@ -104,27 +104,6 @@ fn f(
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-enum Direction {
-    Up,
-    Down,
-    Left,
-    Right,
-}
-
-impl Add<&Direction> for Point {
-    type Output = Point;
-
-    fn add(self, rhs: &Direction) -> Self::Output {
-        match rhs {
-            Direction::Up => Point::new(self.x, self.y - 1),
-            Direction::Down => Point::new(self.x, self.y + 1),
-            Direction::Left => Point::new(self.x - 1, self.y),
-            Direction::Right => Point::new(self.x + 1, self.y),
-        }
-    }
-}
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 /// up mirror and down mirror are based on the right side of the slash
 enum Tile {
     /// .
@@ -142,11 +121,11 @@ enum Tile {
 impl From<char> for Tile {
     fn from(c: char) -> Self {
         match c {
-            '.' => Tile::Empty,
-            '|' => Tile::VerticalSplit,
-            '-' => Tile::HorizontalSplit,
-            '\\' => Tile::DownMirror,
-            '/' => Tile::UpMirror,
+            '.' => Empty,
+            '|' => VerticalSplit,
+            '-' => HorizontalSplit,
+            '\\' => DownMirror,
+            '/' => UpMirror,
             _ => panic!("Invalid tile: {}", c),
         }
     }
