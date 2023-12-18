@@ -2,7 +2,7 @@
 
 use std::{
     fmt::Display,
-    ops::{Add, Neg, Range, Sub},
+    ops::{Add, Mul, Neg, Range, Sub},
 };
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
@@ -33,7 +33,7 @@ impl Point {
     pub fn x<K: TryFrom<isize>>(&self) -> K {
         match self.x.try_into() {
             Ok(k) => k,
-            Err(_) => panic!("x can't be converted to K"),
+            Err(_) => panic!("{} can't be converted to K", self.x),
         }
     }
     /// returns `y` in the type `K`
@@ -121,5 +121,13 @@ impl Sub for Point {
 
     fn sub(self, rhs: Self) -> Self::Output {
         self + -rhs
+    }
+}
+
+impl Mul<isize> for Point {
+    type Output = Self;
+
+    fn mul(self, rhs: isize) -> Self::Output {
+        Self::new(self.x * rhs, self.y * rhs)
     }
 }

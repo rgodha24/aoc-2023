@@ -1,6 +1,7 @@
 #![allow(dead_code)]
 
 use std::{
+    collections::{HashMap, HashSet, VecDeque},
     default::Default,
     fmt::{Debug, Display},
     ops::{Index, IndexMut},
@@ -224,6 +225,11 @@ impl<T> Grid<T> {
     pub fn x_points_at(&self, y: usize) -> impl Iterator<Item = Point> {
         (0..self.width()).map(move |x| Point::new(x, y))
     }
+
+    /// returns the count of the number of items in the grid that match the predicate
+    pub fn count(&self, f: impl Fn(&T, &Point) -> bool) -> usize {
+        self.flat_iter().filter(|(t, p)| f(t, p)).count()
+    }
 }
 
 impl<T: Debug> Debug for Grid<T> {
@@ -262,12 +268,30 @@ impl<T: Clone + Default> Grid<T> {
             row.insert(index, Default::default());
         }
     }
+
+    pub fn print<K: Display>(&self, f: impl Fn(&T) -> K) {
+        for row in self.data.iter() {
+            for col in row.iter() {
+                print!("{}", f(col));
+            }
+            println!();
+        }
+    }
 }
 
 impl<T> Grid<T> {
     /// creates an empty grid with the same dimensions as self
     pub fn empty_sized<K: Clone + Default>(&self) -> Grid<K> {
         let data = vec![vec![Default::default(); self.width()]; self.height()];
+
+        Grid { data }
+    }
+
+    pub fn empty(width: usize, height: usize) -> Grid<T>
+    where
+        T: Clone + Default,
+    {
+        let data = vec![vec![Default::default(); width]; height];
 
         Grid { data }
     }
@@ -311,5 +335,44 @@ where
             writeln!(f)?;
         }
         Ok(())
+    }
+}
+
+impl<T> From<HashMap<Point, T>> for Grid<T>
+where
+    T: Default + Clone,
+{
+    fn from(value: HashMap<Point, T>) -> Self {
+        let min_x = value.keys().map(|p| p.x).min().unwrap_or(0);
+        let min_y = value.keys().map(|p| p.y).min().unwrap_or(0);
+        let max_x = value.keys().map(|p| p.x).max().unwrap_or(0);
+        let max_y = value.keys().map(|p| p.y).max().unwrap_or(0);
+
+        let min = Point::new(min_x, min_y);
+
+        let mut data = Grid::empty((max_x - min_x + 1) as usize, (max_y - min_y + 1) as usize);
+        for (k, v) in value.into_iter() {
+            data[k - min] = v;
+        }
+
+        data
+    }
+}
+
+impl From<HashSet<Point>> for Grid<bool> {
+    fn from(value: HashSet<Point>) -> Self {
+        let min_x = value.iter().map(|p| p.x).min().unwrap_or(0);
+        let min_y = value.iter().map(|p| p.y).min().unwrap_or(0);
+        let max_x = value.iter().map(|p| p.x).max().unwrap_or(0);
+        let max_y = value.iter().map(|p| p.y).max().unwrap_or(0);
+
+        let min = Point::new(min_x, min_y);
+
+        let mut data = Grid::empty((max_x - min_x + 1) as usize, (max_y - min_y + 1) as usize);
+        for k in value.into_iter() {
+            data[k - min] = true;
+        }
+
+        data
     }
 }
