@@ -99,7 +99,7 @@ fn f(
             (_, Empty) | (Up | Down, VerticalSplit) | (Left | Right, HorizontalSplit) => {}
         }
 
-        p = p + &heading;
+        p += &heading;
     }
 }
 

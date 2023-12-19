@@ -1,7 +1,7 @@
 #![allow(dead_code)]
 
 use std::{
-    collections::{HashMap, HashSet, VecDeque},
+    collections::{HashMap, HashSet},
     default::Default,
     fmt::{Debug, Display},
     ops::{Index, IndexMut},
