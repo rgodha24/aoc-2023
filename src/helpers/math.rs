@@ -1,3 +1,6 @@
+use itertools::Itertools;
+use num::Integer;
+
 use super::Point;
 
 /// shoelace formula for the area of a polygon given its vertices
@@ -21,8 +24,8 @@ pub fn picks(area: isize, boundaries: isize) -> isize {
     area - boundaries / 2 + 1
 }
 
-pub fn lcm(nums: impl Iterator<Item = usize>) -> usize {
-    nums.fold(1, num::integer::lcm)
+pub fn lcm<T: Integer>(nums: impl Iterator<Item = T>) -> T {
+    nums.reduce(num::integer::lcm).unwrap_or_else(T::one)
 }
 
 pub fn gcd(nums: impl Iterator<Item = usize>) -> usize {
