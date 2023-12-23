@@ -230,6 +230,34 @@ impl<T> Grid<T> {
     pub fn count(&self, f: impl Fn(&T, &Point) -> bool) -> usize {
         self.flat_iter().filter(|(t, p)| f(t, p)).count()
     }
+
+    pub fn get_wrapping(&self, p: Point) -> &T {
+        let x = p.x_u();
+        let y = p.y_u();
+        let width = self.width();
+        let height = self.height();
+        &self.data[y.rem_euclid(height)][x.rem_euclid(width)]
+    }
+
+    pub fn display_colored(&self, points: &[Point])
+    where
+        T: Display + Clone,
+    {
+        use colored::Colorize;
+
+        for (i, row) in self.data.iter().enumerate() {
+            for (j, c) in row.iter().enumerate() {
+                let p = Point::new(j, i);
+
+                if points.contains(&p) {
+                    print!("{}", format!("{}", c).red().bold());
+                } else {
+                    print!("{}", c);
+                }
+            }
+            println!("");
+        }
+    }
 }
 
 impl<T: Debug> Debug for Grid<T> {

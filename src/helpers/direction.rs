@@ -122,3 +122,14 @@ impl From<char> for Direction {
         }
     }
 }
+
+impl Into<char> for Direction {
+    fn into(self) -> char {
+        match self {
+            Right => '>',
+            Left => '<',
+            Up => '^',
+            Down => 'v',
+        }
+    }
+}
