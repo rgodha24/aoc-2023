@@ -32,7 +32,7 @@ impl FromStr for Point3 {
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         let (x, y, z) = s
             .split(',')
-            .filter_map(|s| s.parse::<isize>().ok())
+            .filter_map(|s| s.trim().parse::<isize>().ok())
             .collect_tuple()
             .ok_or(())?;
 
