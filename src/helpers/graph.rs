@@ -43,6 +43,4 @@ impl<T: PartialEq + Debug> Graph<T> {
     {
         todo!()
     }
-
-    fn min_cut_phase:
 }
